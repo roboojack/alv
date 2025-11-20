@@ -1,0 +1,19 @@
+{
+  "hosting": {
+    "public": "label-verifier-ui/dist/label-verifier-ui/browser",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/api/**",
+        "run": {
+          "serviceId": "alv-backend",
+          "region": "us-central1"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,141 @@
+<main class="shell">
+  <header class="hero">
+    <div>
+      <p class="eyebrow">TTB Toolkit</p>
+      <h1>{{ title }}</h1>
+      <p class="lede">
+        Upload a label, drop the form values, and let the AI inspector compare OCR text against the submission
+        in seconds. Pass/fail sounds keep reviewers in the zone.
+      </p>
+    </div>
+    <div class="fixture-buttons">
+      <button type="button" (click)="useFixture('trey')">Prefill Trey Herring</button>
+      <button type="button" (click)="useFixture('ringside')">Prefill Ringside</button>
+      <button type="button" (click)="useFixture('sylphide')">Prefill La Sylphide</button>
+    </div>
+  </header>
+
+  <section class="workspace">
+    <form class="card form-card" [formGroup]="form" (ngSubmit)="submit()">
+      <div class="field-grid">
+        <label>
+          Brand Name
+          <input type="text" formControlName="brand_name" placeholder="Old Tom Distillery" />
+        </label>
+        <label>
+          Product Class / Type
+          <input type="text" formControlName="product_class" placeholder="Kentucky Straight Bourbon Whiskey" />
+        </label>
+      </div>
+      <div class="field-grid">
+        <label>
+          Alcohol Content (ABV)
+          <input type="text" formControlName="alcohol_content" placeholder="45%" />
+        </label>
+        <label>
+          Net Contents
+          <input type="text" formControlName="net_contents" placeholder="750 mL" />
+        </label>
+      </div>
+      <div class="field-grid">
+        <label>
+          Product Type
+          <select formControlName="product_type">
+            <option value="spirits">Spirits</option>
+            <option value="wine">Wine</option>
+            <option value="beer">Beer</option>
+          </select>
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" formControlName="require_gov_warning" /> Require government warning
+        </label>
+      </div>
+
+      <input #fileInput type="file" accept="image/png,image/jpeg" (change)="handleFileChange($event)" hidden />
+      <div
+        class="dropzone"
+        [class.dropzone--active]="isDragging"
+        (dragover)="handleDragOver($event)"
+        (dragleave)="handleDragLeave($event)"
+        (drop)="handleDrop($event)"
+        role="button"
+        tabindex="0"
+        (click)="fileInput.click()"
+        (keydown.enter)="fileInput.click()"
+        (keydown.space)="fileInput.click()"
+      >
+        <ng-container *ngIf="selectedFile; else placeholder">
+          <p class="filename">{{ selectedFile!.name }}</p>
+          <p class="meta">{{ selectedFile!.size / 1024 | number: '1.0-0' }} KB · {{ selectedFile!.type }}</p>
+          <button class="ghost" type="button" (click)="clearAttachment()">Clear</button>
+        </ng-container>
+        <ng-template #placeholder>
+          <p>Drop a label image or click to browse</p>
+          <small>PNG / JPG • High-contrast labels work best</small>
+        </ng-template>
+      </div>
+
+      <div class="actions">
+        <button class="primary" type="submit" [disabled]="!canSubmit">
+          {{ isSubmitting ? 'Verifying…' : 'Run Verification' }}
+        </button>
+        <button class="ghost" type="button" (click)="resetForm()">Reset</button>
+      </div>
+      <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+    </form>
+
+    <section class="card preview-card">
+      <div class="status-area" *ngIf="status">
+        <span [class]="classForStatus()">{{ status }}</span>
+        <span class="duration" *ngIf="durationMs">{{ durationMs | number: '1.0-0' }} ms</span>
+      </div>
+      <div class="preview-window" [class.preview-window--empty]="!previewUrl">
+        <img *ngIf="previewUrl" [src]="previewUrl" alt="Label preview" />
+        <p *ngIf="!previewUrl">Preview appears here after you attach a label.</p>
+      </div>
+      <div class="checks" *ngIf="checks.length">
+        <div class="check-row" *ngFor="let check of checks">
+          <span [class]="badgeClassFor(check)">{{ check.status }}</span>
+          <div>
+            <p class="check-title">{{ check.field | titlecase }}</p>
+            <p class="check-message">{{ check.message }}</p>
+          </div>
+        </div>
+      </div>
+      <p class="empty" *ngIf="!checks.length">
+        When you run a verification you'll see a checklist of compliance findings here.
+      </p>
+    </section>
+  </section>
+
+  <section class="card ocr-card" *ngIf="ocrTokens.length">
+    <div class="card-header">
+      <h3>OCR Highlights</h3>
+      <small>Top tokens surfaced directly from EasyOCR</small>
+    </div>
+    <div class="chips">
+      <span class="chip" *ngFor="let token of ocrTokens">{{ token }}</span>
+    </div>
+    <textarea readonly [value]="rawOcrText"></textarea>
+  </section>
+
+  <section class="card history-card" *ngIf="history.length">
+    <div class="card-header">
+      <h3>Recent Runs</h3>
+      <small>Fast recap for shoulder surfing & QA</small>
+    </div>
+    <ul>
+      <li *ngFor="let item of history">
+        <span class="pill" [class.pill--pass]="item.status === 'PASS'" [class.pill--fail]="item.status === 'FAIL'">
+          {{ item.status }}
+        </span>
+        <strong>{{ item.brand }}</strong>
+        <span class="muted">{{ item.timestamp | date: 'shortTime' }}</span>
+        <span class="muted">{{ item.duration | number: '1.0-0' }} ms</span>
+      </li>
+    </ul>
+  </section>
+</main>
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+
+
