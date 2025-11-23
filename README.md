@@ -29,6 +29,57 @@ graph TD
     end
 ```
 
+## Matching Logic
+
+The verification engine uses a multi-stage fuzzy matching approach to handle OCR imperfections (glare, distortion, stylized fonts).
+
+```mermaid
+graph TD
+    Start["Input: Form Payload + OCR Text"] --> Norm["Normalization"]
+    Norm -->|Standard & Aggressive| Checks
+
+    subgraph Checks
+        subgraph Brand
+            B1{"Exact Match?"} -->|Yes| B_Pass["Pass"]
+            B1 -->|No| B2{"Aggressive Match?"}
+            B2 -->|Yes| B_Pass
+            B2 -->|No| B3{"Fuzzy Token Match?"}
+            B3 -->|Yes| B_Pass
+            B3 -->|No| B_Fail["Fail"]
+        end
+
+        subgraph Class
+            C1{"Exact Match?"} -->|Yes| C_Pass["Pass"]
+            C1 -->|No| C2{"Synonym Match?"}
+            C2 -->|Yes| C_Pass
+            C2 -->|No| C3{"Fuzzy Token Match?"}
+            C3 -->|Yes| C_Pass
+            C3 -->|No| C_Fail["Fail"]
+        end
+
+        subgraph ABV
+            A1["Extract Candidates"] --> A2{"Within Tolerance?"}
+            A2 -->|Yes| A_Pass["Pass"]
+            A2 -->|No| A_Fail["Fail"]
+        end
+
+        subgraph Net
+            N1{"Exact Match?"} -->|Yes| N_Pass["Pass"]
+            N1 -->|No| N2{"Compact Match?"}
+            N2 -->|Yes| N_Pass
+            N2 -->|No| N3{"Missing Decimal?"}
+            N3 -->|Yes| N_Pass
+            N3 -->|No| N4{"Fuzzy Volume?"}
+            N4 -->|Yes| N_Pass
+            N4 -->|No| N5{"Volume Parsing?"}
+            N5 -->|Yes| N_Pass
+            N5 -->|No| N_Fail["Fail"]
+        end
+    end
+
+    Checks --> Result["Verification Report"]
+```
+
 ## Running Locally
 
 ### Prerequisites

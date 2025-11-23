@@ -15,6 +15,29 @@ _VOLUME_PARSE_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
+# Synonyms for product class matching (e.g. Spanish/French terms on labels)
+_CLASS_SYNONYMS = {
+    "RON": "RUM",
+    "RHUM": "RUM",
+    "VODKA": "VODKA",
+    "WHISKEY": "WHISKY",
+    "WHISKY": "WHISKEY",
+    "GIN": "GIN",
+    "TEQUILA": "TEQUILA",
+    "MEZCAL": "MEZCAL",
+    "BRANDY": "BRANDY",
+    "COGNAC": "COGNAC",
+    "BOURBON": "BOURBON",
+    "SCOTCH": "SCOTCH",
+    "LIQUEUR": "LIQUEUR",
+    "CORDIAL": "CORDIAL",
+    "ORO": "GOLD",
+    "PLATA": "SILVER",
+    "BLANCO": "SILVER",
+    "ANEJO": "AGED",
+    "REPOSADO": "RESTED",
+}
+
 
 def _compact(text: str) -> str:
     return text.replace(" ", "")
@@ -24,6 +47,17 @@ def _normalize(text: str) -> str:
     upper = text.upper()
     collapsed = _NORMALIZE_PATTERN.sub(" ", upper)
     return " ".join(collapsed.split())
+
+
+def _aggressive_normalize_for_matching(text: str) -> str:
+    """
+    Aggressive normalization to handle 'G 0 L D' vs 'GOLD' and '0' vs 'O'.
+    Removes spaces and maps 0->O.
+    """
+    norm = _normalize(text)
+    # Map 0 to O to handle OCR confusion in text fields (risky for numbers, use carefully)
+    norm = norm.replace("0", "O")
+    return _compact(norm)
 
 
 def _find_substring(haystack: str, needle: str) -> bool:
@@ -93,6 +127,8 @@ class MatcherContext:
     normalized_text: str
     raw_text: str
     token_set: set[str]
+    # Derived context for advanced matching
+    aggressive_text: str
 
 
 def _tokens_present(target: str, token_set: set[str]) -> bool:
@@ -113,10 +149,17 @@ def check_brand(
     payload: VerificationPayload, ctx: MatcherContext, settings: Settings
 ) -> FieldCheck:
     target = _normalize(payload.brand_name)
-    if target and (
-        _find_substring(ctx.normalized_text, target)
-        or _tokens_present(target, ctx.token_set)
-    ):
+    if not target:
+        return FieldCheck(
+            field="brand_name",
+            status=CheckStatus.mismatch,
+            message="Brand name is empty",
+            evidence=payload.brand_name,
+            confidence=0.0,
+        )
+
+    # 1. Exact substring match
+    if _find_substring(ctx.normalized_text, target) or _tokens_present(target, ctx.token_set):
         return FieldCheck(
             field="brand_name",
             status=CheckStatus.match,
@@ -124,24 +167,37 @@ def check_brand(
             evidence=payload.brand_name,
             confidence=0.95,
         )
-    if target:
-        tokens = target.split()
-        if tokens:
-            similarity = settings.matcher_thresholds.brand_token_similarity
-            required_fraction = settings.matcher_thresholds.brand_token_match_fraction
-            hits = sum(
-                1
-                for token in tokens
-                if _token_similarity(token, ctx.token_set, similarity)
+
+    # 2. Aggressive match (ignoring spaces and 0/O confusion)
+    aggressive_target = _aggressive_normalize_for_matching(target)
+    if aggressive_target and aggressive_target in ctx.aggressive_text:
+        return FieldCheck(
+            field="brand_name",
+            status=CheckStatus.match,
+            message="Brand name detected (fuzzy space/char match)",
+            evidence=payload.brand_name,
+            confidence=0.85,
+        )
+
+    # 3. Token-based fuzzy match
+    tokens = target.split()
+    if tokens:
+        similarity = settings.matcher_thresholds.brand_token_similarity
+        required_fraction = settings.matcher_thresholds.brand_token_match_fraction
+        hits = sum(
+            1
+            for token in tokens
+            if _token_similarity(token, ctx.token_set, similarity)
+        )
+        if hits and hits / len(tokens) >= required_fraction:
+            return FieldCheck(
+                field="brand_name",
+                status=CheckStatus.match,
+                message="Brand name inferred from fuzzy token matches",
+                evidence=payload.brand_name,
+                confidence=0.72,
             )
-            if hits and hits / len(tokens) >= required_fraction:
-                return FieldCheck(
-                    field="brand_name",
-                    status=CheckStatus.match,
-                    message="Brand name inferred from fuzzy token matches",
-                    evidence=payload.brand_name,
-                    confidence=0.72,
-                )
+
     return FieldCheck(
         field="brand_name",
         status=CheckStatus.mismatch,
@@ -153,7 +209,17 @@ def check_brand(
 
 def check_product_class(payload: VerificationPayload, ctx: MatcherContext) -> FieldCheck:
     target = _normalize(payload.product_class)
-    if target and _find_substring(ctx.normalized_text, target):
+    if not target:
+        return FieldCheck(
+            field="product_class",
+            status=CheckStatus.mismatch,
+            message="Product class is empty",
+            evidence=payload.product_class,
+            confidence=0.0,
+        )
+
+    # 1. Exact match
+    if _find_substring(ctx.normalized_text, target):
         return FieldCheck(
             field="product_class",
             status=CheckStatus.match,
@@ -161,17 +227,34 @@ def check_product_class(payload: VerificationPayload, ctx: MatcherContext) -> Fi
             evidence=payload.product_class,
             confidence=0.9,
         )
-    if target:
-        tokens = target.split()
-        hits = sum(1 for token in tokens if _token_similarity(token, ctx.token_set, 0.72))
-        if hits / len(tokens) >= 0.75:
-            return FieldCheck(
+
+    # 2. Synonym match (e.g. RON -> RUM)
+    # Check if any synonym of the target class appears in the text
+    # Invert the map to find synonyms for the target
+    synonyms = [k for k, v in _CLASS_SYNONYMS.items() if v == target]
+    for synonym in synonyms:
+        if _find_substring(ctx.normalized_text, synonym) or _tokens_present(synonym, ctx.token_set):
+             return FieldCheck(
                 field="product_class",
                 status=CheckStatus.match,
-                message="Majority of class/type keywords surfaced despite OCR noise",
+                message=f"Product class detected via synonym '{synonym}'",
                 evidence=payload.product_class,
-                confidence=0.75,
+                confidence=0.85,
             )
+    
+    target_tokens = target.split()
+
+    # 3. Fuzzy token match
+    hits = sum(1 for token in target_tokens if _token_similarity(token, ctx.token_set, 0.72))
+    if hits / len(target_tokens) >= 0.75:
+        return FieldCheck(
+            field="product_class",
+            status=CheckStatus.match,
+            message="Majority of class/type keywords surfaced despite OCR noise",
+            evidence=payload.product_class,
+            confidence=0.75,
+        )
+
     return FieldCheck(
         field="product_class",
         status=CheckStatus.mismatch,
@@ -224,6 +307,8 @@ def check_net_contents(payload: VerificationPayload, ctx: MatcherContext) -> Opt
     if not payload.net_contents:
         return None
     normalized_target = _normalize(payload.net_contents)
+    
+    # 1. Exact match
     if _find_substring(ctx.normalized_text, normalized_target):
         return FieldCheck(
             field="net_contents",
@@ -232,6 +317,8 @@ def check_net_contents(payload: VerificationPayload, ctx: MatcherContext) -> Opt
             evidence=payload.net_contents,
             confidence=0.85,
         )
+
+    # 2. Compact match (ignore spaces)
     no_space_target = _compact(normalized_target)
     if no_space_target and no_space_target in _compact(ctx.normalized_text):
         return FieldCheck(
@@ -241,6 +328,58 @@ def check_net_contents(payload: VerificationPayload, ctx: MatcherContext) -> Opt
             evidence=payload.net_contents,
             confidence=0.82,
         )
+
+    # 3. "Missing Decimal" match (e.g. 1.75 L -> 175 L)
+    # Remove dots from target and check if it exists in compact text
+    no_dot_target = no_space_target.replace(".", "")
+    if no_dot_target and no_dot_target in _compact(ctx.normalized_text):
+         return FieldCheck(
+            field="net_contents",
+            status=CheckStatus.match,
+            message="Net contents detected (ignoring decimal point)",
+            evidence=payload.net_contents,
+            confidence=0.75,
+        )
+
+    # 4. Fuzzy Volume Match (e.g. 1.76 L vs 1.75 L, or 175 L vs 1.75 L)
+    canonical_expected = _canonicalize_volume_value(payload.net_contents)
+    if canonical_expected is not None:
+        # Extract candidates from compact text: digits followed by unit
+        compact_text = _compact(ctx.normalized_text)
+        # Regex for digits followed by unit (L, ML, FLOZ, etc)
+        # Units: L, ML, FLOZ, OZ. In compact text: L, ML, FLOZ, OZ.
+        # Note: OUNCES -> OUNCES.
+        candidates = re.finditer(r"(\d+)(ML|L|FLOZ|OZ|OUNCES|LITERS|MILLILITERS)", compact_text)
+        for match in candidates:
+            digits = match.group(1)
+            unit = match.group(2)
+            # Try scaling the digits: 176 -> 176, 17.6, 1.76, 0.176
+            val = float(digits)
+            scales = [1.0, 0.1, 0.01, 0.001]
+            
+            # Get unit multiplier
+            unit_key = re.sub(r"[^A-Z]", "", unit.upper())
+            multiplier = {
+                "ML": 1.0, "MILLILITERS": 1.0,
+                "L": 1000.0, "LITERS": 1000.0,
+                "FLOZ": 29.5735, "OZ": 29.5735, "OUNCES": 29.5735
+            }.get(unit_key, 1.0)
+
+            for scale in scales:
+                scaled_val = val * scale
+                canonical_candidate = scaled_val * multiplier
+                # Allow 5% tolerance or 0.5 ML/OZ absolute?
+                # Use relative tolerance for safety
+                if abs(canonical_candidate - canonical_expected) / canonical_expected < 0.05:
+                     return FieldCheck(
+                        field="net_contents",
+                        status=CheckStatus.match,
+                        message=f"Net contents inferred from '{digits}{unit}' (interpreted as {scaled_val} {unit})",
+                        evidence=payload.net_contents,
+                        confidence=0.7,
+                    )
+
+    # 5. Volume parsing match (standard)
     detected = _extract_volume_strings(ctx.normalized_text)
     canonical_expected = _canonicalize_volume_value(payload.net_contents)
     if canonical_expected is not None:
@@ -312,7 +451,10 @@ def run_all_checks(
     raw_text = " ".join(raw_lines)
     normalized_text = _normalize(raw_text)
     ctx = MatcherContext(
-        normalized_text=normalized_text, raw_text=raw_text, token_set=set(normalized_text.split())
+        normalized_text=normalized_text,
+        raw_text=raw_text,
+        token_set=set(normalized_text.split()),
+        aggressive_text=_aggressive_normalize_for_matching(raw_text)
     )
     results: List[FieldCheck] = []
     results.append(check_brand(payload, ctx, settings))

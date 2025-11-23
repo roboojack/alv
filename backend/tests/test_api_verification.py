@@ -61,6 +61,17 @@ import pytest
             },
             "PASS",
         ),
+        (
+            "PXL_20251123_002949433.MP.jpg",
+            {
+                "brand_name": "Grand Blue",
+                "product_class": "Brandy",
+                "alcohol_content": "80 PROOF",
+                "net_contents": None,
+                "require_gov_warning": False,
+            },
+            "PASS",
+        ),
     ],
 )
 def test_verify_success_cases(client, labels_dir, filename, payload, expected_status):
@@ -165,16 +176,6 @@ def test_verify_failure_cases(client, labels_dir, filename, payload):
                 "brand_name": "425 Wine Co",
                 "product_class": "Kosher Wine",
                 "alcohol_content": "12%",
-                "net_contents": None,
-                "require_gov_warning": False,
-            },
-        ),
-        (
-            "PXL_20251123_002949433.MP.jpg",
-            {
-                "brand_name": "Grand Blue",
-                "product_class": "Brandy",
-                "alcohol_content": "80 PROOF",
                 "net_contents": None,
                 "require_gov_warning": False,
             },

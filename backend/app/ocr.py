@@ -28,8 +28,8 @@ MAX_IMAGE_SIDE = 3072
 def _preprocess(image_bytes: bytes) -> Image.Image:
     image: Image.Image = Image.open(BytesIO(image_bytes))
     image = cast(Image.Image, ImageOps.exif_transpose(image))  # normalize orientation
-    if image.mode != "RGB":
-        image = image.convert("RGB")
+    if image.mode != "L":
+        image = image.convert("L")
     longest_edge = max(image.size)
     if longest_edge > MAX_IMAGE_SIDE:
         scale = MAX_IMAGE_SIDE / longest_edge
@@ -39,11 +39,11 @@ def _preprocess(image_bytes: bytes) -> Image.Image:
         )
         # Downscale aggressively to keep OCR under Firebase's 60s proxy limit
         image = image.resize(new_size, Image.Resampling.LANCZOS)
+    
     boosted = ImageOps.autocontrast(image, cutoff=2)
-    contrast = ImageEnhance.Contrast(boosted).enhance(1.2)
-    sharpened = ImageEnhance.Sharpness(contrast).enhance(1.15)
-    denoised = sharpened.filter(ImageFilter.MedianFilter(size=3))
-    return denoised
+    contrast = ImageEnhance.Contrast(boosted).enhance(1.5)
+    sharpened = ImageEnhance.Sharpness(contrast).enhance(1.5)
+    return sharpened
 
 
 @lru_cache
