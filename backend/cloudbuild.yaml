@@ -29,6 +29,7 @@ steps:
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
+      - '--max-instances=1'
       # Pass the API key from Cloud Build environment to Cloud Run
       # Note: It's better to use Secret Manager, but for now we map the env var.
       - '--set-env-vars'
