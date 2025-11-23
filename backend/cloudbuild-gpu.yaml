@@ -1,0 +1,11 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -f
+      - Dockerfile.gpu
+      - -t
+      - gcr.io/alv-2025/alv-backend:gpu
+      - .
+images:
+  - gcr.io/alv-2025/alv-backend:gpu
