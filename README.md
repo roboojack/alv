@@ -133,7 +133,10 @@ gcloud config set project alv-2025
 
 # Submit build (uses backend/cloudbuild.yaml)
 # This command builds the image, pushes it to GCR, and deploys to Cloud Run.
-gcloud builds submit backend --config backend/cloudbuild.yaml
+# You must pass your API key as a substitution variable.
+gcloud builds submit backend \
+  --config backend/cloudbuild.yaml \
+  --substitutions=_ALV_GEMINI_API_KEY=your_key_here
 ```
 
 ### 2. Frontend Deployment (Firebase)

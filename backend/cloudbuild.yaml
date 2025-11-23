@@ -6,14 +6,14 @@ steps:
       - -f
       - Dockerfile
       - -t
-      - gcr.io/alv-2025/alv-backend:latest
+      - gcr.io/alv-2025/alv-backend:${_TAG}
       - .
 
   # 2. Push the container image
   - name: gcr.io/cloud-builders/docker
     args:
       - push
-      - gcr.io/alv-2025/alv-backend:latest
+      - gcr.io/alv-2025/alv-backend:${_TAG}
 
   # 3. Deploy to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -23,11 +23,20 @@ steps:
       - 'deploy'
       - 'alv-backend'
       - '--image'
-      - 'gcr.io/alv-2025/alv-backend:latest'
+      - 'gcr.io/alv-2025/alv-backend:${_TAG}'
       - '--region'
       - 'us-central1'
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
+      # Pass the API key from Cloud Build environment to Cloud Run
+      # Note: It's better to use Secret Manager, but for now we map the env var.
+      - '--set-env-vars'
+      - 'ALV_GEMINI_API_KEY=${_ALV_GEMINI_API_KEY}'
+
+substitutions:
+  _TAG: latest
+  _ALV_GEMINI_API_KEY: "" # Expected to be passed via trigger or command line
+
 images:
-  - gcr.io/alv-2025/alv-backend:latest
+  - gcr.io/alv-2025/alv-backend:${_TAG}
