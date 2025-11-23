@@ -7,7 +7,7 @@ AI-assisted toolkit that mirrors a simplified TTB review workflow. An Angular 18
 ## Stack
 - **Backend** (`backend/`): FastAPI + EasyOCR + PyTorch, pytest suite with real bourbon label fixtures from Wikimedia Commons.
 - **Frontend** (`label-verifier-ui/`): Angular 18 standalone app with reactive forms, drag-and-drop uploader, animated scoreboards, and pass/fail audio cues.
-- **Fixtures**: `backend/tests/data/labels` contains three CC0/PD bourbon labels used both in tests and in the sample prefill buttons.
+- **Fixtures**: `backend/tests/data/labels` contains real label images used both in tests and in the sample prefill buttons.
 
 ## Deployment Architecture
 
@@ -82,14 +82,34 @@ graph TD
 
 ## Running Locally
 
-### Prerequisites
+### Quick Start
+We provide helper scripts to spin up both the backend (FastAPI) and frontend (Angular) in one go.
+
+**Mac / Linux**
+```bash
+chmod +x start.sh
+./start.sh
+```
+
+**Windows**
+```cmd
+start.bat
+```
+
+The app will open at `http://localhost:4200` and the API at `http://localhost:8000`.
+
+### Manual Setup
+
+If you prefer to run services individually or use Docker:
+
+#### Prerequisites
 - Python 3.11+
 - Node.js 18+
 - Docker (optional)
 
-### Backend (FastAPI)
+#### Backend (FastAPI)
 
-**Option 1: Python Virtual Environment (Mac/Linux/Windows)**
+**Option 1: Python Virtual Environment**
 
 ```bash
 cd backend
