@@ -4,16 +4,15 @@ These notes capture the conventions that make contributors productive quickly.
 
 ## Architecture Snapshot
 - Backend lives in `backend/app` (FastAPI) and exposes `POST /api/verify`; frontend lives in `label-verifier-ui` (Angular 18 standalone) and consumes the same endpoint via `VerificationService`.
-- Verification flow: Angular form → FastAPI endpoint → `VerifierService` → `ocr.run_ocr` (EasyOCR) → `matcher.run_all_checks` → response with per-field verdicts, OCR tokens, raw text.
+- Verification flow: Angular form → FastAPI endpoint → `VerifierService` → Google Gemini VLM (2.5 Flash) → response with per-field verdicts, OCR tokens, raw text.
 - Sample bourbon labels from Wikimedia Commons sit in `backend/tests/data/labels` and double as manual QA fixtures (prefill buttons in the UI reference those payloads).
 
 ## Backend Guidelines
 - Configuration (`app/config.py`) holds matcher thresholds and CORS origins; fetch with `get_settings()` instead of instantiating `Settings` manually so env overrides work.
-- OCR lives in `app/ocr.py`; always call `run_ocr(bytes, settings)` which wraps preprocessing + cached EasyOCR reader. Never construct EasyOCR readers ad-hoc (expensive & non-threadsafe).
-- Matching rules belong in `app/matcher.py`. Use `_normalize` helpers; fuzzy comparisons already exist for brand tokens + product class (difflib). Add new checks by returning `FieldCheck` objects so FastAPI response stays uniform.
-- Service layer (`services/verifier_service.py`) is the only place that should call both OCR and matcher. If you add new dependencies (databases, S3, etc.), extend this service and inject via FastAPI dependency wiring.
-- Tests must cover both rule logic and OCR integration. Use pytest fixtures (`tests/conftest.py`) plus the real label images to prove end-to-end behavior.
-- Commands: `cd backend && pytest` for suites, `uvicorn app.main:app --reload` for local API. First run downloads EasyOCR weights (~80 MB) so allow time in CI.
+- Service layer (`services/verifier_service.py`) is the core logic hub. It constructs the VLM prompt, calls Gemini, and parses the JSON response.
+- If you add new dependencies (databases, S3, etc.), extend this service and inject via FastAPI dependency wiring.
+- Tests must cover both rule logic and VLM integration. Use pytest fixtures (`tests/conftest.py`) plus the real label images to prove end-to-end behavior.
+- Commands: `cd backend && pytest` for suites, `uvicorn app.main:app --reload` for local API.
 
 ## Frontend Guidelines
 - Angular app is standalone (no NgModules). `AppComponent` imports `CommonModule` + `ReactiveFormsModule`; keep new UI in standalone components or feature directories when expanding.

@@ -1,4 +1,5 @@
 steps:
+  # 1. Build the container image
   - name: gcr.io/cloud-builders/docker
     args:
       - build
@@ -7,5 +8,26 @@ steps:
       - -t
       - gcr.io/alv-2025/alv-backend:latest
       - .
+
+  # 2. Push the container image
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - gcr.io/alv-2025/alv-backend:latest
+
+  # 3. Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'alv-backend'
+      - '--image'
+      - 'gcr.io/alv-2025/alv-backend:latest'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
 images:
   - gcr.io/alv-2025/alv-backend:latest

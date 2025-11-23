@@ -25,8 +25,7 @@ graph TD
     CloudRun -->|Image Pull| GCR[Container Registry]
     
     subgraph Backend_Workflow [Backend Deployment]
-    CloudBuild[Cloud Build] -->|Build & Push| GCR
-    GCR -->|Deploy| CloudRun
+    CloudBuild[Cloud Build] -->|Build, Push & Deploy| CloudRun
     end
     
     subgraph Frontend_Workflow [Frontend Deployment]
@@ -112,14 +111,13 @@ The application will run at `http://localhost:4200`. The dev server proxies API 
 
 ## Running Tests
 
-The backend includes a comprehensive test suite covering rule logic and end-to-end OCR flows.
+The backend includes a comprehensive test suite covering rule logic and end-to-end VLM flows.
 
 ```bash
 cd backend
 # Activate your virtual environment first
 pytest
 ```
-*Note: The first run downloads EasyOCR weights (~80 MB).*
 
 ## Deployment
 
@@ -134,15 +132,8 @@ We use Cloud Build to build the Docker image and deploy it to Cloud Run.
 gcloud config set project alv-2025
 
 # Submit build (uses backend/cloudbuild.yaml)
+# This command builds the image, pushes it to GCR, and deploys to Cloud Run.
 gcloud builds submit backend --config backend/cloudbuild.yaml
-
-# Deploy to Cloud Run
-gcloud run deploy alv-backend \
-  --image gcr.io/alv-2025/alv-backend:latest \
-  --region us-central1 \
-  --platform managed \
-  --allow-unauthenticated \
-  --set-env-vars ALV_GEMINI_API_KEY=your_key_here
 ```
 
 ### 2. Frontend Deployment (Firebase)
