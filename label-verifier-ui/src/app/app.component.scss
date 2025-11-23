@@ -345,6 +345,35 @@ button.ghost {
   color: var(--muted);
 }
 
+.ad-banner {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.ad-placeholder {
+  width: 100%;
+  max-width: 728px; /* Standard leaderboard size */
+  min-height: 90px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed var(--border);
+  border-radius: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  text-align: center;
+}
+
+.ad-placeholder small {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  font-size: 0.7rem;
+  margin-bottom: 0.5rem;
+}
+
 @media (max-width: 768px) {
   .actions {
     flex-direction: column;
