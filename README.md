@@ -18,10 +18,15 @@ graph TD
     Firebase -->|/api/* Rewrites| CloudRun["Cloud Run (Backend)"]
     CloudRun -->|OCR Processing| GPU["GPU/CPU Resources"]
     CloudRun -->|Image Pull| GCR[Container Registry]
-    GitHub[GitHub Repo] -->|Push| CloudBuild[Cloud Build]
-    CloudBuild -->|Build & Push| GCR
-    CloudBuild -->|Deploy| CloudRun
-    CloudBuild -->|Deploy| Firebase
+    
+    subgraph Backend_Workflow [Backend Deployment]
+    CloudBuild[Cloud Build] -->|Build & Push| GCR
+    GCR -->|Deploy| CloudRun
+    end
+    
+    subgraph Frontend_Workflow [Frontend Deployment]
+    CLI[Firebase CLI] -->|Deploy| Firebase
+    end
 ```
 
 ## Running Locally
