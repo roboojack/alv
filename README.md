@@ -15,8 +15,8 @@ AI-assisted toolkit that mirrors a simplified TTB review workflow. An Angular 18
 graph TD
     User[User Browser] -->|HTTPS| Firebase[Firebase Hosting]
     Firebase -->|Static Assets| Angular[Angular App]
-    Firebase -->|/api/* Rewrites| CloudRun[Cloud Run (Backend)]
-    CloudRun -->|OCR Processing| GPU[GPU/CPU Resources]
+    Firebase -->|/api/* Rewrites| CloudRun["Cloud Run (Backend)"]
+    CloudRun -->|OCR Processing| GPU["GPU/CPU Resources"]
     CloudRun -->|Image Pull| GCR[Container Registry]
     GitHub[GitHub Repo] -->|Push| CloudBuild[Cloud Build]
     CloudBuild -->|Build & Push| GCR
