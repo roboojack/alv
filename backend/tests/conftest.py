@@ -16,4 +16,5 @@ def labels_dir() -> Path:
 @pytest.fixture(scope="session")
 def client() -> TestClient:
     app = create_app()
+    app.state.limiter.enabled = False
     return TestClient(app)
