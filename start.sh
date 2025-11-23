@@ -20,12 +20,11 @@ cd backend
 if [ ! -d ".venv" ]; then
     echo "Creating virtual environment..."
     python3 -m venv .venv
-    source .venv/bin/activate
-    echo "Installing backend dependencies..."
-    pip install -r requirements.txt
-else
-    source .venv/bin/activate
 fi
+
+source .venv/bin/activate
+echo "Installing/Updating backend dependencies..."
+pip install -r requirements.txt
 
 # Run uvicorn in the background
 uvicorn app.main:app --reload &

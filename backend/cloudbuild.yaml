@@ -3,9 +3,9 @@ steps:
     args:
       - build
       - -f
-      - Dockerfile.gpu
+      - Dockerfile
       - -t
-      - gcr.io/alv-2025/alv-backend:gpu
+      - gcr.io/alv-2025/alv-backend:latest
       - .
 images:
-  - gcr.io/alv-2025/alv-backend:gpu
+  - gcr.io/alv-2025/alv-backend:latest

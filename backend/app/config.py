@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     ]
     ocr_languages: List[str] = ["en"]
     use_gpu: bool = False
+    gemini_api_key: str = ""
     matcher_thresholds: MatcherThresholds = MatcherThresholds()
     gov_warning_phrase: str = "GOVERNMENT WARNING"
     gov_warning_snippet: str = (

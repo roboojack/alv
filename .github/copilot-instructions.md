@@ -27,3 +27,4 @@ These notes capture the conventions that make contributors productive quickly.
 - Use the provided sample fixtures via the UI buttons or by posting multiparts with the JSON bodies in `tests/test_api_verification.py`.
 - When tweaking OCR thresholds, update both `Settings.matcher_thresholds` and the tests—they assert on matches/mismatches for real images.
 - Keep the README up to date with run instructions. Any new env var should be documented in `backend/.env.example` (create if needed) and referenced in the instructions file.
+- **Security**: Ensure that no secrets or sensitive data (API keys, credentials) are ever committed to the repository. Use `.env` files and environment variables.
