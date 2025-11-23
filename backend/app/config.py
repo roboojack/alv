@@ -24,8 +24,6 @@ class Settings(BaseSettings):
         "http://localhost:4200",
         "http://127.0.0.1:4200",
     ]
-    ocr_languages: List[str] = ["en"]
-    use_gpu: bool = False
     gemini_api_key: str = ""
     matcher_thresholds: MatcherThresholds = MatcherThresholds()
     gov_warning_phrase: str = "GOVERNMENT WARNING"
