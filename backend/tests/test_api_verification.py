@@ -72,6 +72,17 @@ import pytest
             },
             "PASS",
         ),
+        (
+            "black_ridge.jpg",
+            {
+                "brand_name": "Black Ridge",
+                "product_class": "Kentucky Straight Bourbon Whiskey",
+                "alcohol_content": "90 PROOF",
+                "net_contents": None,
+                "require_gov_warning": False,
+            },
+            "PASS",
+        ),
     ],
 )
 def test_verify_success_cases(client, labels_dir, filename, payload, expected_status):
@@ -111,25 +122,15 @@ def test_verify_flags_missing_abv(client, labels_dir):
     "filename,payload",
     [
         (
-            "black_ridge.jpg",
-            {
-                "brand_name": "Black Ridge",
-                "product_class": "Kentucky Straight Bourbon Whiskey",
-                "alcohol_content": "90 PROOF",
-                "net_contents": None,
-                "require_gov_warning": False,
-            },
-        ),
-        (
-            "bushmills.jpg",
-            {
-                "brand_name": "Bushmills",
-                "product_class": "Irish Whiskey",
-                "alcohol_content": "40%",
-                "net_contents": None,
-                "require_gov_warning": False,
-            },
-        ),
+                "bushmills.jpg",
+                {
+                    "brand_name": "Bushmills",
+                    "product_class": "Irish Whiskey",
+                    "alcohol_content": "99%",
+                    "net_contents": None,
+                    "require_gov_warning": False,
+                },
+            ),
         (
             "old_crow.jpg",
             {
@@ -271,15 +272,15 @@ def test_verify_failure_cases(client, labels_dir, filename, payload):
             },
         ),
         (
-            "PXL_20251123_003454651.MP.jpg",
-            {
-                "brand_name": "Gem Clear",
-                "product_class": "Neutral Spirit",
-                "alcohol_content": "95%",
-                "net_contents": None,
-                "require_gov_warning": False,
-            },
-        ),
+                "PXL_20251123_003454651.MP.jpg",
+                {
+                    "brand_name": "Gem Clear",
+                    "product_class": "Neutral Spirit",
+                    "alcohol_content": "99%",
+                    "net_contents": None,
+                    "require_gov_warning": False,
+                },
+            ),
         (
             "PXL_20251123_003504471.MP.jpg",
             {
@@ -291,15 +292,15 @@ def test_verify_failure_cases(client, labels_dir, filename, payload):
             },
         ),
         (
-            "PXL_20251123_003610755.MP.jpg",
-            {
-                "brand_name": "Bacardi Gold",
-                "product_class": "Rum",
-                "alcohol_content": "40%",
-                "net_contents": None,
-                "require_gov_warning": False,
-            },
-        ),
+                "PXL_20251123_003610755.MP.jpg",
+                {
+                    "brand_name": "Bacardi Gold",
+                    "product_class": "Rum",
+                    "alcohol_content": "99%",
+                    "net_contents": None,
+                    "require_gov_warning": False,
+                },
+            ),
         (
             "PXL_20251123_003620523.MP.jpg",
             {

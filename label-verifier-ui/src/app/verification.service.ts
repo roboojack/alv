@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { VerificationResponse } from './models';
 
-const API_BASE = (window as { __ALV_API__?: string }).__ALV_API__ ?? 'http://localhost:8000/api';
+const API_BASE = (window as { __ALV_API__?: string }).__ALV_API__ ?? '/api';
 
 @Injectable({ providedIn: 'root' })
 export class VerificationService {

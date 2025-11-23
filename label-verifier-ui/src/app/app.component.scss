@@ -39,15 +39,28 @@
 .fixture-buttons {
   display: flex;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .fixture-buttons button {
   background: transparent;
   border: 1px solid var(--border);
   color: var(--text);
-  padding: 0.6rem 1.1rem;
+  padding: 0.4rem 1.1rem 0.4rem 0.4rem;
   border-radius: 999px;
   transition: border-color 0.2s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.fixture-buttons button img {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border);
 }
 
 .fixture-buttons button:hover {
@@ -330,6 +343,35 @@ button.ghost {
 
 .empty {
   color: var(--muted);
+}
+
+.ad-banner {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.ad-placeholder {
+  width: 100%;
+  max-width: 728px; /* Standard leaderboard size */
+  min-height: 90px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed var(--border);
+  border-radius: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  text-align: center;
+}
+
+.ad-placeholder small {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  font-size: 0.7rem;
+  margin-bottom: 0.5rem;
 }
 
 @media (max-width: 768px) {

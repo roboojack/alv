@@ -1,24 +1,22 @@
 # Alcohol Label Verifier – Architecture Plan
 
 ## High-Level Overview
-- **Goal**: Intake structured form data + label image, run OCR, and report match/mismatch per compliance rule, exposing a FastAPI backend and an Angular SPA frontend.
+- **Goal**: Intake structured form data + label image, run VLM analysis, and report match/mismatch per compliance rule, exposing a FastAPI backend and an Angular SPA frontend.
 - **Stack**:
-  - Backend: Python 3.11, FastAPI, EasyOCR, Pydantic, Uvicorn, pytest + httpx for tests.
+  - Backend: Python 3.11, FastAPI, Google Gemini 2.5 Flash, Pydantic, Uvicorn, pytest + httpx for tests.
   - Frontend: Angular 18 (standalone components), Tailwind-like utility styling via CSS variables, ngx-toastr? (opt) but we will stick to custom components.
   - Assets: Real bourbon label images sourced from Wikimedia Commons, stored under `backend/tests/data/labels` for deterministic tests.
 
 ## Backend Modules (`backend/app`)
-1. `config.py`: Centralized settings (OCR languages, thresholds, temp paths, version info).
+1. `config.py`: Centralized settings (API keys, thresholds, version info).
 2. `schemas.py`: Pydantic models for requests (form fields) and responses (per-field verdicts, summary, OCR debug dump).
-3. `ocr.py`: Lazy-load EasyOCR reader, image preprocessing helpers (grayscale, denoise) using Pillow + numpy.
-4. `matcher.py`: Domain-specific comparison rules (brand, class/type, ABV tolerance, net contents, government warning) returning `MatchResult` objects.
-5. `routes.py` / `main.py`: FastAPI app with `/api/health` and `/api/verify` (multipart form + file). Integrates CORS for Angular dev (`http://localhost:4200`).
-6. `services/verifier_service.py`: Orchestrates OCR pipeline + matcher, and aggregates scoreboard metrics for UI.
+3. `routes.py` / `main.py`: FastAPI app with `/api/health` and `/api/verify` (multipart form + file). Integrates CORS for Angular dev (`http://localhost:4200`).
+4. `services/verifier_service.py`: Orchestrates Gemini VLM pipeline and aggregates scoreboard metrics for UI.
 
 ## Backend Data Flow
 1. Angular posts `multipart/form-data` containing JSON string for form payload + binary image.
-2. FastAPI stores image in temp file, runs `ocr.extract_text(path)` (returns normalized tokens + raw text block).
-3. `matcher.verify(form, ocr_result)` loops through rule objects (`BrandRule`, `ClassRule`, etc.) that each report `matched`, `evidence`, and `details`.
+2. FastAPI constructs a prompt for Gemini 2.5 Flash, including the image and the form data.
+3. Gemini analyzes the image and compares it against the form data, returning a structured JSON response.
 4. Response includes:
    ```json
    {
@@ -29,8 +27,7 @@
    ```
 
 ## Test Strategy
-- **Unit**: Rule-specific tests with synthetic OCR payloads (no OCR dependency) for edge cases.
-- **Integration**: pytest with FastAPI TestClient hitting `/api/verify` using real label image fixtures (downloaded into repo). Ensures OCR + rules interplay.
+- **Integration**: pytest with FastAPI TestClient hitting `/api/verify` using real label image fixtures (downloaded into repo). Ensures VLM integration.
 - **Golden Assets**: `Trey_Herring`, `La_Sylphide`, `Ringside` labels. Provide expected form inputs for match/mismatch scenarios.
 
 ## Frontend (`frontend/label-verifier-ui`)

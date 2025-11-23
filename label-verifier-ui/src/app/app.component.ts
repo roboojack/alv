@@ -47,21 +47,60 @@ export class AppComponent implements OnDestroy {
   private readonly failureAudio = new Audio('assets/audio/failure-buzzer.wav');
   private objectUrl?: string;
 
-  readonly fixtures: Record<string, Partial<VerificationForm>> = {
+  readonly fixtures: Record<string, Partial<VerificationForm> & { image: string }> = {
     trey: {
       brand_name: "Trey Herring's",
       product_class: 'Carolina Bourbon Whiskey',
-      alcohol_content: '45%'
+      alcohol_content: '45%',
+      image: 'trey_herring.png'
     },
     ringside: {
       brand_name: 'Quality Distillers',
       product_class: 'Kentucky Straight Bourbon Whiskey',
-      alcohol_content: '45%'
+      alcohol_content: '45%',
+      image: 'ringside_bourbon.jpg'
     },
     sylphide: {
       brand_name: 'La Sylphide',
       product_class: 'Bourbon Whiskey',
-      alcohol_content: '45%'
+      alcohol_content: '45%',
+      image: 'la_sylphide.jpg'
+    },
+    bacardi: {
+      brand_name: 'Bacardi Gold',
+      product_class: 'Rum',
+      alcohol_content: '40%',
+      image: 'bacardi_gold.jpg'
+    },
+    mogen: {
+      brand_name: 'Mogen David',
+      product_class: 'Blackberry Wine',
+      alcohol_content: '10%',
+      image: 'mogen_david.jpg'
+    },
+    eandj: {
+      brand_name: 'E & J',
+      product_class: 'American Brandy',
+      alcohol_content: '40%',
+      image: 'e_and_j_brandy.jpg'
+    },
+    cactus: {
+      brand_name: 'Cactus Jack',
+      product_class: 'Tequila',
+      alcohol_content: '40%',
+      image: 'cactus_jack.jpg'
+    },
+    canadian: {
+      brand_name: 'Canadian Mist',
+      product_class: 'Canadian Whisky',
+      alcohol_content: '40%',
+      image: 'canadian_mist.jpg'
+    },
+    dekuyper: {
+      brand_name: 'DeKuyper Anisette',
+      product_class: 'Anisette Liqueur',
+      alcohol_content: '30%',
+      image: 'dekuyper_anisette.jpg'
     }
   };
 
@@ -209,7 +248,21 @@ export class AppComponent implements OnDestroy {
     return this.status === 'PASS' ? 'status-chip status-chip--pass' : 'status-chip status-chip--fail';
   }
 
-  useFixture(key: keyof typeof this.fixtures): void {
-    this.form.patchValue(this.fixtures[key]);
+  async useFixture(key: string): Promise<void> {
+    const fixture = this.fixtures[key];
+    if (!fixture) return;
+
+    this.form.patchValue(fixture);
+
+    if (fixture.image) {
+      try {
+        const response = await fetch(`assets/fixtures/${fixture.image}`);
+        const blob = await response.blob();
+        const file = new File([blob], fixture.image, { type: blob.type });
+        this.dropFile(file);
+      } catch (error) {
+        console.error('Failed to load fixture image', error);
+      }
+    }
   }
 }

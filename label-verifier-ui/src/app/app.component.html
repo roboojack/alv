@@ -9,9 +9,42 @@
       </p>
     </div>
     <div class="fixture-buttons">
-      <button type="button" (click)="useFixture('trey')">Prefill Trey Herring</button>
-      <button type="button" (click)="useFixture('ringside')">Prefill Ringside</button>
-      <button type="button" (click)="useFixture('sylphide')">Prefill La Sylphide</button>
+      <button type="button" (click)="useFixture('trey')">
+        <img src="assets/fixtures/trey_herring.png" alt="Trey Herring" />
+        <span>Prefill Trey Herring</span>
+      </button>
+      <button type="button" (click)="useFixture('ringside')">
+        <img src="assets/fixtures/ringside_bourbon.jpg" alt="Ringside" />
+        <span>Prefill Ringside</span>
+      </button>
+      <button type="button" (click)="useFixture('sylphide')">
+        <img src="assets/fixtures/la_sylphide.jpg" alt="La Sylphide" />
+        <span>Prefill La Sylphide</span>
+      </button>
+      <button type="button" (click)="useFixture('bacardi')">
+        <img src="assets/fixtures/bacardi_gold.jpg" alt="Bacardi Gold" />
+        <span>Prefill Bacardi</span>
+      </button>
+      <button type="button" (click)="useFixture('mogen')">
+        <img src="assets/fixtures/mogen_david.jpg" alt="Mogen David" />
+        <span>Prefill Mogen David</span>
+      </button>
+      <button type="button" (click)="useFixture('eandj')">
+        <img src="assets/fixtures/e_and_j_brandy.jpg" alt="E & J Brandy" />
+        <span>Prefill E & J</span>
+      </button>
+      <button type="button" (click)="useFixture('cactus')">
+        <img src="assets/fixtures/cactus_jack.jpg" alt="Cactus Jack" />
+        <span>Prefill Cactus Jack</span>
+      </button>
+      <button type="button" (click)="useFixture('canadian')">
+        <img src="assets/fixtures/canadian_mist.jpg" alt="Canadian Mist" />
+        <span>Prefill Canadian Mist</span>
+      </button>
+      <button type="button" (click)="useFixture('dekuyper')">
+        <img src="assets/fixtures/dekuyper_anisette.jpg" alt="DeKuyper" />
+        <span>Prefill DeKuyper</span>
+      </button>
     </div>
   </header>
 
@@ -134,6 +167,29 @@
         <span class="muted">{{ item.duration | number: '1.0-0' }} ms</span>
       </li>
     </ul>
+  </section>
+
+  <!-- Advertisement Slot -->
+  <section class="ad-banner">
+    <div class="ad-placeholder">
+      <small>Advertisement</small>
+      <!-- Replace this div with your actual AdSense <ins> tag -->
+      <div class="ad-content">
+        <!-- Example AdSense Unit -->
+        <!--
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+             data-ad-slot="XXXXXXXXXX"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+        -->
+        <p class="muted">Support ALV by checking out our sponsors</p>
+      </div>
+    </div>
   </section>
 </main>
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->

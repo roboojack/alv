@@ -37,9 +37,13 @@
       {
         "source": "/api/**",
         "run": {
-          "serviceId": "alv-backend-gpu",
+          "serviceId": "alv-backend",
           "region": "us-central1"
         }
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
       }
     ]
   }
