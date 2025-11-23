@@ -17,25 +17,88 @@ _VOLUME_PARSE_PATTERN = re.compile(
 
 # Synonyms for product class matching (e.g. Spanish/French terms on labels)
 _CLASS_SYNONYMS = {
+    # RUM
     "RON": "RUM",
     "RHUM": "RUM",
-    "VODKA": "VODKA",
-    "WHISKEY": "WHISKY",
+    "CACHACA": "RUM",
+    
+    # WHISKEY
     "WHISKY": "WHISKEY",
-    "GIN": "GIN",
-    "TEQUILA": "TEQUILA",
-    "MEZCAL": "MEZCAL",
-    "BRANDY": "BRANDY",
-    "COGNAC": "COGNAC",
-    "BOURBON": "BOURBON",
-    "SCOTCH": "SCOTCH",
-    "LIQUEUR": "LIQUEUR",
-    "CORDIAL": "CORDIAL",
+    "WHISKEY": "WHISKY",
+    "BOURBON": "WHISKEY",
+    "SCOTCH": "WHISKEY",
+    "RYE": "WHISKEY",
+    
+    # VODKA
+    "WODKA": "VODKA",
+    
+    # GIN
+    "GINEBRA": "GIN",
+    "GENEVER": "GIN",
+    
+    # TEQUILA / MEZCAL
+    "AGAVE": "TEQUILA",
+    "MEZCAL": "TEQUILA",
+    
+    # BRANDY
+    "COGNAC": "BRANDY",
+    "ARMAGNAC": "BRANDY",
+    "CALVADOS": "BRANDY",
+    "PISCO": "BRANDY",
+    "BRANDWEIN": "BRANDY",
+    
+    # LIQUEUR
+    "CORDIAL": "LIQUEUR",
+    "LIQUEUR": "CORDIAL",
+    "SCHNAPPS": "LIQUEUR",
+    "AMARO": "LIQUEUR",
+    "CREME": "LIQUEUR",
+    "TRIPLE SEC": "LIQUEUR",
+    "CURACAO": "LIQUEUR",
+    "ANISETTE": "LIQUEUR",
+    "SAMBUCA": "LIQUEUR",
+    "LIMONCELLO": "LIQUEUR",
+    "LICOR": "LIQUEUR",
+    
+    # WINE
+    "VINO": "WINE",
+    "VIN": "WINE",
+    "WEIN": "WINE",
+    "CHAMPAGNE": "SPARKLING WINE",
+    "PROSECCO": "SPARKLING WINE",
+    "CAVA": "SPARKLING WINE",
+    "SEKT": "SPARKLING WINE",
+    
+    # BEER
+    "CERVEZA": "BEER",
+    "BIERE": "BEER",
+    "BIRRA": "BEER",
+    "ALE": "BEER",
+    "LAGER": "BEER",
+    "STOUT": "BEER",
+    "PORTER": "BEER",
+    "IPA": "BEER",
+    
+    # DESCRIPTORS
     "ORO": "GOLD",
+    "DORADO": "GOLD",
+    "AMBRE": "AMBER",
     "PLATA": "SILVER",
     "BLANCO": "SILVER",
+    "SILVER": "WHITE",
+    "PLATINUM": "SILVER",
     "ANEJO": "AGED",
+    "VIEUX": "OLD",
+    "ANCIEN": "ANCIENT",
     "REPOSADO": "RESTED",
+    "JOVEN": "YOUNG",
+    "EXTRA": "EXTRA",
+    "SPECIAL": "SPECIAL",
+    "SUPERIOR": "SUPERIOR",
+    "FINO": "FINE",
+    "SECO": "DRY",
+    "DOUX": "SWEET",
+    "DULCE": "SWEET",
 }
 
 
