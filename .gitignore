@@ -15,6 +15,9 @@ label-verifier-ui/dist/
 
 # Firebase / tooling
 firebase-debug.log
+.firebase/
 
 # macOS
 .DS_Store
+Take-Home Project_ AI-Powered Alcohol Label Verification App.pdf
+SECURITY.md

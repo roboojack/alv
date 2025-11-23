@@ -1,14 +1,14 @@
-FROM python:3.11-slim
+FROM pytorch/pytorch:2.5.1-cuda12.1-cudnn9-runtime
 
 ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
-    PYTHONPATH=/app
+    PYTHONPATH=/app \
+    NVIDIA_VISIBLE_DEVICES=all \
+    NVIDIA_DRIVER_CAPABILITIES=compute,utility
 
 WORKDIR /app
 
-# System deps required by EasyOCR / Torch for image handling
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
     ffmpeg \
     libsm6 \
     libxext6 \
@@ -16,8 +16,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libglib2.0-0 \
   && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt ./
-RUN pip install --upgrade pip && pip install -r requirements.txt
+COPY requirements-gpu.txt ./
+RUN pip install --upgrade pip && pip install -r requirements-gpu.txt
 
 # Create a non-root user
 RUN useradd -m -u 1000 appuser

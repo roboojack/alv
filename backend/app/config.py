@@ -9,6 +9,8 @@ class MatcherThresholds(BaseModel):
     abv_tolerance_percent: float = 0.5  # +/- 0.5% ABV allowance
     token_confidence_floor: float = 0.35
     min_token_length: int = 2
+    brand_token_similarity: float = 0.72
+    brand_token_match_fraction: float = 0.5
 
 
 class Settings(BaseSettings):
