@@ -116,7 +116,8 @@ The backend includes a comprehensive test suite covering rule logic and end-to-e
 ```bash
 cd backend
 # Activate your virtual environment first
-pytest
+./run_tests.sh
+# Or manually: pytest -n auto
 ```
 
 ## Deployment

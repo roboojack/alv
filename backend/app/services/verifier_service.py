@@ -49,6 +49,12 @@ class VerifierService:
         
         try:
             img = Image.open(io.BytesIO(image_bytes))
+            
+            # Optimization: Resize large images to speed up inference
+            # Max dimension 1024px is usually sufficient for OCR on labels
+            if img.width > 1024 or img.height > 1024:
+                img.thumbnail((1024, 1024))
+                
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Invalid image file: {e}")
 

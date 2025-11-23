@@ -89,6 +89,18 @@ export class AppComponent implements OnDestroy {
       product_class: 'Tequila',
       alcohol_content: '40%',
       image: 'cactus_jack.jpg'
+    },
+    canadian: {
+      brand_name: 'Canadian Mist',
+      product_class: 'Canadian Whisky',
+      alcohol_content: '40%',
+      image: 'canadian_mist.jpg'
+    },
+    dekuyper: {
+      brand_name: 'DeKuyper Anisette',
+      product_class: 'Anisette Liqueur',
+      alcohol_content: '30%',
+      image: 'dekuyper_anisette.jpg'
     }
   };
 

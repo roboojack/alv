@@ -72,6 +72,17 @@ import pytest
             },
             "PASS",
         ),
+        (
+            "black_ridge.jpg",
+            {
+                "brand_name": "Black Ridge",
+                "product_class": "Kentucky Straight Bourbon Whiskey",
+                "alcohol_content": "90 PROOF",
+                "net_contents": None,
+                "require_gov_warning": False,
+            },
+            "PASS",
+        ),
     ],
 )
 def test_verify_success_cases(client, labels_dir, filename, payload, expected_status):
@@ -110,16 +121,6 @@ def test_verify_flags_missing_abv(client, labels_dir):
 @pytest.mark.parametrize(
     "filename,payload",
     [
-        (
-            "black_ridge.jpg",
-            {
-                "brand_name": "Black Ridge",
-                "product_class": "Kentucky Straight Bourbon Whiskey",
-                "alcohol_content": "90 PROOF",
-                "net_contents": None,
-                "require_gov_warning": False,
-            },
-        ),
         (
                 "bushmills.jpg",
                 {

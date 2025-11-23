@@ -12,7 +12,7 @@ These notes capture the conventions that make contributors productive quickly.
 - Service layer (`services/verifier_service.py`) is the core logic hub. It constructs the VLM prompt, calls Gemini, and parses the JSON response.
 - If you add new dependencies (databases, S3, etc.), extend this service and inject via FastAPI dependency wiring.
 - Tests must cover both rule logic and VLM integration. Use pytest fixtures (`tests/conftest.py`) plus the real label images to prove end-to-end behavior.
-- Commands: `cd backend && pytest` for suites, `uvicorn app.main:app --reload` for local API.
+- Commands: `cd backend && ./run_tests.sh` (or `pytest -n auto`) for suites, `uvicorn app.main:app --reload` for local API.
 
 ## Frontend Guidelines
 - Angular app is standalone (no NgModules). `AppComponent` imports `CommonModule` + `ReactiveFormsModule`; keep new UI in standalone components or feature directories when expanding.
